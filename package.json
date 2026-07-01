@@ -1,0 +1,13 @@
+{
+  "name": "pdf-redactor",
+  "private": true,
+  "version": "0.1.0",
+  "description": "スキャンPDFの墨消しツール（ブラウザ完結・Cloudflare Pages）",
+  "scripts": {
+    "dev": "wrangler pages dev",
+    "deploy": "wrangler pages deploy"
+  },
+  "devDependencies": {
+    "wrangler": "^4.105.0"
+  }
+}

@@ -1,0 +1,7 @@
+node_modules/
+.wrangler/
+.dev.vars
+
+# 個人情報を含むPDFは絶対にコミットしない（入力も出力も）
+*.pdf
+data/

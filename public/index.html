@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PDF 墨消し</title>
+<!-- ライブラリはCDN。プライバシー用途なので後でローカルに同梱(vendor)する予定。
+     ※PDF自体はどこにも送信されません。読み込むのはライブラリのJSだけです。 -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+<style>
+  :root { color-scheme: light; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; color: #31333f; background: #fff;
+    font-family: "Source Sans Pro", system-ui, "Segoe UI", "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
+  }
+
+  /* ── サイドバー（Streamlit風） ── */
+  .sidebar {
+    position: fixed; top: 0; left: 0; bottom: 0; width: 300px; overflow-y: auto;
+    background: #f0f2f6; padding: 22px 20px 48px;
+  }
+  .app-title { font-weight: 700; font-size: 20px; line-height: 1.35; margin-bottom: 2px; }
+  .app-sub { font-size: 12px; color: #6b6f76; }
+  .hr { height: 1px; background: #e2e4ea; border: 0; margin: 18px 0; }
+  .section { display: flex; flex-direction: column; gap: 8px; }
+  .shead { font-weight: 700; font-size: 15px; margin: 0 0 2px; }
+  .cap { font-size: 12.5px; color: #6b6f76; margin: 4px 0 -2px; }
+  .hint { font-size: 11.5px; color: #8a8f98; }
+
+  .sidebar .filebtn, .sidebar button, .sidebar #q, .sidebar select {
+    width: 100%; font-size: 14px; border-radius: 8px; border: 1px solid #d5d7dd;
+    background: #fff; color: #31333f;
+  }
+  .sidebar .filebtn, .sidebar button { padding: 9px 12px; text-align: center; cursor: pointer; font-weight: 500; }
+  .sidebar #q, .sidebar select { padding: 9px 10px; }
+  .sidebar .filebtn:hover, .sidebar button:hover:not(:disabled) { border-color: #ff4b4b; color: #ff4b4b; }
+  .sidebar button.primary { background: #ff4b4b; border-color: #ff4b4b; color: #fff; font-weight: 600; }
+  .sidebar button.primary:hover:not(:disabled) { background: #e63c3c; color: #fff; }
+  .sidebar button:disabled, .sidebar #q:disabled { opacity: .55; cursor: not-allowed; background: #f0f1f3; }
+  .filebtn input { display: none; }
+
+  .badge { display: inline-block; font-size: 12px; padding: 3px 9px; border-radius: 999px;
+           border: 1px solid #cfd2d8; background: #fff; color: #555; }
+  .badge.ok { background: #e8f5e9; border-color: #c8e6c9; color: #256029; }
+  .badge.warn { background: #fff4e5; border-color: #ffe0b2; color: #8a5300; }
+  #count { font-variant-numeric: tabular-nums; color: #444; font-size: 14px; }
+  .note { font-size: 12px; color: #6b6f76; line-height: 1.55; }
+  .link { font-size: 13px; color: #1f6feb; text-decoration: none; }
+  .link:hover { text-decoration: underline; }
+  .disc { font-size: 12px; color: #6b6f76; }
+  .disc summary { cursor: pointer; color: #31333f; font-weight: 600; font-size: 12.5px; }
+  .disc .disc-body { margin-top: 6px; line-height: 1.6; }
+
+  /* ── 本文（ページ一覧） ── */
+  .main { margin-left: 300px; min-height: 100vh; padding: 24px 40px 80px; }
+  .main-title { font-size: 26px; font-weight: 700; margin: 0 0 4px; }
+  #status { font-size: 13px; color: #555; margin: 0 0 18px; min-height: 20px; }
+
+  #pages { display: flex; flex-direction: column; align-items: center; gap: 24px; }
+  .page { display: flex; flex-direction: column; gap: 6px; max-width: 100%; }
+  .phead { display: flex; align-items: center; gap: 10px; font-size: 13px; color: #555; }
+  .phead button.mini { width: auto; padding: 3px 8px; font-size: 12px; border-radius: 6px;
+                       border: 1px solid #d5d7dd; background: #fff; cursor: pointer; }
+  .stage { position: relative; max-width: 100%; background: #fff; box-shadow: 0 2px 12px rgba(0,0,0,.12); }
+  .stage canvas.view { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  .stage canvas.overlay { position: absolute; inset: 0; width: 100%; height: 100%;
+                          cursor: crosshair; touch-action: none; }
+
+  @media (max-width: 768px) {
+    .sidebar { position: static; width: 100%; bottom: auto; }
+    .main { margin-left: 0; padding: 16px 14px 60px; }
+  }
+</style>
+</head>
+<body>
+  <!-- ── サイドバー ── -->
+  <aside class="sidebar">
+    <div class="app-title">🖊 PDF 墨消し</div>
+    <div class="app-sub">ブラウザ内で完結・送信なし</div>
+    <div class="hr"></div>
+
+    <div class="section">
+      <div class="shead">■ ファイル</div>
+      <div class="cap">PDFを選ぶと種別を自動判定</div>
+      <label class="filebtn">📄 PDFを選ぶ<input id="file" type="file" accept="application/pdf"></label>
+      <div><span id="ptype" class="badge">—</span></div>
+    </div>
+    <div class="hr"></div>
+
+    <div class="section">
+      <div class="shead">■ 文字で墨消し</div>
+      <div class="cap">墨消しする文字列</div>
+      <input id="q" type="text" placeholder="例: 山口敦治" disabled>
+      <button id="search" disabled>🔍 検索して枠追加</button>
+      <div class="hint">スキャンPDF（文字なし）では使えません</div>
+    </div>
+    <div class="hr"></div>
+
+    <div class="section">
+      <div class="shead">■ 枠の操作</div>
+      <div class="cap">ページ上をドラッグで枠追加／枠クリックで削除</div>
+      <span id="count">枠: 0</span>
+      <button id="undo">元に戻す</button>
+      <button id="clearAll">全ページの枠を消去</button>
+    </div>
+    <div class="hr"></div>
+
+    <div class="section">
+      <div class="shead">■ 出力</div>
+      <div class="cap">出力解像度</div>
+      <select id="dpi">
+        <option value="150">150dpi（軽い）</option>
+        <option value="200" selected>200dpi（標準）</option>
+        <option value="300">300dpi（高精細）</option>
+      </select>
+      <button id="apply" class="primary">墨消しを適用</button>
+      <button id="download" disabled>⬇ ダウンロード</button>
+    </div>
+    <div class="hr"></div>
+
+    <div class="note">処理はすべてお使いのブラウザ内で行われ、<b>PDFはどこにも送信されません</b>。出力は元の画素・文字ごと消えた画像PDFです。</div>
+    <div class="hr"></div>
+
+    <div class="section">
+      <div class="shead">■ このアプリについて</div>
+      <a class="link" href="https://github.com/minnanosaiban/pdf-redactor" target="_blank" rel="noopener">ソースコード（GitHub）↗</a>
+      <details class="disc">
+        <summary>免責事項</summary>
+        <div class="disc-body">本ツールは無保証で提供されます（現状有姿）。墨消しは各ページを画像化して黒く塗りつぶす方式ですが、消し忘れ・塗り不足を含め、出力結果の最終確認は利用者の責任で行ってください。処理はお使いのブラウザ内で完結しPDFは外部送信されませんが、ご利用環境に起因する情報漏えいについて作成者は責任を負いません。本ツールの利用により生じたいかなる損害についても作成者は責任を負わず、本ツールは法的助言を提供するものではありません。</div>
+      </details>
+    </div>
+  </aside>
+
+  <!-- ── 本文 ── -->
+  <main class="main">
+    <h1 class="main-title">墨消しページ</h1>
+    <div id="status">左の「📄 PDFを選ぶ」でPDFを読み込むと、全ページがここに縦に並びます。</div>
+    <div id="pages"></div>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
