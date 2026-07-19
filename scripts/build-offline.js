@@ -17,6 +17,7 @@ const appJs = fs.readFileSync(path.join(PUBLIC, "app.js"), "utf8");
 const pdfjs = fs.readFileSync(path.join(VENDOR, "pdf.min.js"), "utf8");
 const pdfjsWorker = fs.readFileSync(path.join(VENDOR, "pdf.worker.min.js"), "utf8");
 const pdfLib = fs.readFileSync(path.join(VENDOR, "pdf-lib.min.js"), "utf8");
+const favicon = fs.readFileSync(path.join(PUBLIC, "favicon.svg"));
 
 // </script> をライブラリ本文がそのまま含んでいた場合にHTMLを壊さないようにエスケープ
 const escapeScriptClose = (s) => s.replace(/<\/script/gi, "<\\/script");
@@ -63,6 +64,9 @@ out = out.replace(
   () => `<script>\n${escapeScriptClose(appJsOffline)}\n</script>`
 );
 out = out.replace("<title>PDF 墨消し</title>", () => "<title>PDF 墨消し（オフライン版）</title>");
+// favicon も外部ファイル参照だと file:// 単体配布時に読み込めないため data URI に埋め込む
+const faviconDataUri = `data:image/svg+xml;base64,${favicon.toString("base64")}`;
+out = out.replace('<link rel="icon" type="image/svg+xml" href="favicon.svg">', () => `<link rel="icon" type="image/svg+xml" href="${faviconDataUri}">`);
 // オフライン版自身の中に「オフライン版をダウンロード」リンク（自己参照）は不要なので取り除く
 out = out.replace(OFFLINE_LINK_RE, () => "");
 out = out.replace(
