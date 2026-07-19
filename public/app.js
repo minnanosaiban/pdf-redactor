@@ -342,7 +342,8 @@ $("apply").onclick = async () => {
       markRedacted(p);
       setStatus(`墨消し中… ${p}/${numPages}`);
     }
-    out.setTitle(""); out.setAuthor(""); out.setSubject("");
+    out.setTitle($("metaTitle").value.replace(/\s+/g, " ").trim());
+    out.setAuthor(""); out.setSubject("");
     out.setKeywords([]); out.setProducer("pdf-redactor"); out.setCreator("pdf-redactor");
     const outBytes = await out.save();
     outputBlob = new Blob([outBytes], { type: "application/pdf" });

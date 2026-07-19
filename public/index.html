@@ -7,11 +7,11 @@
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://pdf-redactor.pages.dev/">
-<meta property="og:title" content="PDF 墨消し">
+<meta property="og:title" content="PDF 墨消しアプリ">
 <meta property="og:description" content="スキャンPDFの氏名・住所などをブラウザだけで黒塗り。送信なし・ブラウザ内で完結、オフライン版もあります。">
 <meta property="og:image" content="https://pdf-redactor.pages.dev/og-image.png">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="PDF 墨消し">
+<meta name="twitter:title" content="PDF 墨消しアプリ">
 <meta name="twitter:description" content="スキャンPDFの氏名・住所などをブラウザだけで黒塗り。送信なし・ブラウザ内で完結、オフライン版もあります。">
 <meta name="twitter:image" content="https://pdf-redactor.pages.dev/og-image.png">
 <!-- ライブラリはCDN。プライバシー用途なので後でローカルに同梱(vendor)する予定。
@@ -45,16 +45,17 @@
   .cap { font-size: 12.5px; color: #6b6f76; margin: 4px 0 -2px; }
   .hint { font-size: 11.5px; color: #8a8f98; }
 
-  .sidebar .filebtn, .sidebar button, .sidebar #q, .sidebar select {
+  .sidebar .filebtn, .sidebar button, .sidebar input[type="text"], .sidebar select, .sidebar textarea {
     width: 100%; font-size: 14px; border-radius: 8px; border: 1px solid #d5d7dd;
-    background: #fff; color: #31333f;
+    background: #fff; color: #31333f; font-family: inherit;
   }
   .sidebar .filebtn, .sidebar button { padding: 9px 12px; text-align: center; cursor: pointer; font-weight: 500; }
-  .sidebar #q, .sidebar select { padding: 9px 10px; }
+  .sidebar input[type="text"], .sidebar select, .sidebar textarea { padding: 9px 10px; }
+  .sidebar textarea { height: 108px; resize: none; line-height: 1.5; }
   .sidebar .filebtn:hover, .sidebar button:hover:not(:disabled) { border-color: #ff4b4b; color: #ff4b4b; }
   .sidebar button.primary { background: #ff4b4b; border-color: #ff4b4b; color: #fff; font-weight: 600; }
   .sidebar button.primary:hover:not(:disabled) { background: #e63c3c; color: #fff; }
-  .sidebar button:disabled, .sidebar #q:disabled { opacity: .55; cursor: not-allowed; background: #f0f1f3; }
+  .sidebar button:disabled, .sidebar input[type="text"]:disabled { opacity: .55; cursor: not-allowed; background: #f0f1f3; }
   .filebtn input { display: none; }
 
   .badge { display: inline-block; font-size: 12px; padding: 3px 9px; border-radius: 999px;
@@ -131,6 +132,8 @@
         <option value="200" selected>200dpi（標準）</option>
         <option value="300">300dpi（高精細）</option>
       </select>
+      <div class="cap">タイトル（任意・Google検索結果に使われます）</div>
+      <textarea id="metaTitle" placeholder="例: ENEOS（エネオス）第１準備書面　内部通報制度裁判　"></textarea>
       <button id="apply" class="primary">墨消しを適用</button>
       <button id="download" disabled>⬇ ダウンロード</button>
     </div>
