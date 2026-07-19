@@ -42,10 +42,10 @@ if (!html.includes(CDN_SCRIPT_TAGS)) {
 if (!appJs.includes(WORKER_LINE)) {
   throw new Error("app.js のワーカー設定行が見つかりません。build-offline.js の WORKER_LINE を確認してください。");
 }
-const OFFLINE_LINK =
-  '\n      <a class="link" href="pdf-redactor-offline.html" download>⬇ オフライン版をダウンロード（通信なしで動作）</a>';
-if (!html.includes(OFFLINE_LINK)) {
-  throw new Error("index.html のオフライン版ダウンロードリンクが見つかりません。build-offline.js の OFFLINE_LINK を確認してください。");
+// 表示文言が変わっても壊れないよう、リンク先(href)基準の正規表現で検出する
+const OFFLINE_LINK_RE = /\n[ \t]*<a class="link" href="pdf-redactor-offline\.html" download>[^<]*<\/a>/;
+if (!OFFLINE_LINK_RE.test(html)) {
+  throw new Error("index.html のオフライン版ダウンロードリンクが見つかりません。build-offline.js の OFFLINE_LINK_RE を確認してください。");
 }
 
 // replace の第2引数を文字列にすると "$&" 等がライブラリ本文に含まれた場合に
@@ -64,7 +64,7 @@ out = out.replace(
 );
 out = out.replace("<title>PDF 墨消し</title>", () => "<title>PDF 墨消し（オフライン版）</title>");
 // オフライン版自身の中に「オフライン版をダウンロード」リンク（自己参照）は不要なので取り除く
-out = out.replace(OFFLINE_LINK, () => "");
+out = out.replace(OFFLINE_LINK_RE, () => "");
 out = out.replace(
   "処理はすべてお使いのブラウザ内で行われ、<b>PDFはどこにも送信されません</b>。出力は元の画素・文字ごと消えた画像PDFです。",
   () => "これはオフライン版です。<b>ライブラリも含めて外部通信を一切行いません</b>（このHTMLファイル単体で完結）。出力は元の画素・文字ごと消えた画像PDFです。"
