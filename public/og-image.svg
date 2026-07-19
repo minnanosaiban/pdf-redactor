@@ -1,0 +1,12 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="630" fill="#000000"/>
+  <text x="600" y="260" text-anchor="middle" dominant-baseline="central"
+        font-family="'Hiragino Sans','Hiragino Kaku Gothic ProN','Yu Gothic',Meiryo,sans-serif"
+        font-weight="700" font-size="112" fill="#ffffff">PDF 墨消し</text>
+  <text x="600" y="350" text-anchor="middle" dominant-baseline="central"
+        font-family="'Hiragino Sans','Hiragino Kaku Gothic ProN','Yu Gothic',Meiryo,sans-serif"
+        font-weight="400" font-size="34" fill="#c2c6cc">スキャンPDFの氏名・住所などをブラウザだけで黒塗り</text>
+  <text x="600" y="405" text-anchor="middle" dominant-baseline="central"
+        font-family="'Hiragino Sans','Hiragino Kaku Gothic ProN','Yu Gothic',Meiryo,sans-serif"
+        font-weight="400" font-size="26" fill="#84899a">送信なし・ブラウザ内で完結　／　オフライン版あり</text>
+</svg>
