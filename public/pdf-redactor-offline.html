@@ -249,12 +249,13 @@ $("undo").onclick = () => {
   const p = history.pop();
   if (p == null) return;
   rectsOf(p).pop();
+  if (dom[p]) dom[p].redacted = false;
   drawOverlay(p); updateCount();
 };
 $("clearAll").onclick = () => {
   for (const k of Object.keys(rectsByPage)) rectsByPage[k] = [];
   history.length = 0;
-  for (const k of Object.keys(dom)) drawOverlay(+k);
+  for (const k of Object.keys(dom)) { dom[k].redacted = false; drawOverlay(+k); }
   updateCount();
 };
 $("search").onclick = () => searchAndAdd(qInput.value);
@@ -321,6 +322,7 @@ function buildPages(w, h) {
     clr.onclick = () => {
       rectsByPage[p] = [];
       for (let i = history.length - 1; i >= 0; i--) if (history[i] === p) history.splice(i, 1);
+      dom[p].redacted = false;
       drawOverlay(p); updateCount();
     };
     head.appendChild(lbl); head.appendChild(clr);
@@ -336,7 +338,7 @@ function buildPages(w, h) {
     wrap.appendChild(head); wrap.appendChild(stage);
     pagesEl.appendChild(wrap);
 
-    dom[p] = { wrap, stage, view, overlay, rendered: false, rendering: false, preview: null };
+    dom[p] = { wrap, stage, view, overlay, rendered: false, rendering: false, preview: null, redacted: false };
     attachDraw(p);
   }
 }
@@ -387,8 +389,41 @@ function drawOverlay(p) {
     ctx.fillRect(r.x * W, r.y * H, r.w * W, r.h * H);
     ctx.strokeRect(r.x * W, r.y * H, r.w * W, r.h * H);
   };
-  for (const r of rectsOf(p)) draw(r, "rgba(220,0,0,0.35)", "rgba(220,0,0,0.9)");
+  const [fill, stroke] = d.redacted
+    ? ["rgba(0,0,0,0.95)", "rgba(0,0,0,1)"]
+    : ["rgba(220,0,0,0.35)", "rgba(220,0,0,0.9)"];
+  for (const r of rectsOf(p)) draw(r, fill, stroke);
   if (d.preview) draw(d.preview, "rgba(0,0,0,0.25)", "rgba(0,0,0,0.7)");
+}
+
+// 赤枠→黒塗りへ短いアニメーションで遷移させる（「墨消しを適用」の視覚フィードバック用）
+function markRedacted(p) {
+  const d = dom[p];
+  if (!d) return;
+  d.redacted = true;
+  if (!d.rendered || !rectsOf(p).length) return;
+  const rects = rectsOf(p);
+  const DURATION = 260;
+  const from = [220, 0, 0], to = [0, 0, 0];
+  const t0 = performance.now();
+  const step = (now) => {
+    if (!d.rendered) return;   // アニメ中にページが画面外へ流れて解放された
+    const t = Math.min(1, (now - t0) / DURATION);
+    const rgb = from.map((v, i) => Math.round(v + (to[i] - v) * t));
+    const alpha = 0.35 + (0.95 - 0.35) * t;
+    const o = d.overlay, ctx = o.getContext("2d"), W = o.width, H = o.height;
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = `rgba(${rgb[0]},${rgb[1]},${rgb[2]},${alpha})`;
+    ctx.strokeStyle = `rgba(${rgb[0]},${rgb[1]},${rgb[2]},1)`;
+    ctx.lineWidth = 2;
+    for (const r of rects) {
+      ctx.fillRect(r.x * W, r.y * H, r.w * W, r.h * H);
+      ctx.strokeRect(r.x * W, r.y * H, r.w * W, r.h * H);
+    }
+    if (t < 1) requestAnimationFrame(step);
+    else drawOverlay(p);       // 最終状態を通常描画で確定
+  };
+  requestAnimationFrame(step);
 }
 
 // ---- 文字検索して墨消し枠を自動追加（サーチャブルPDFのみ） ----
@@ -413,6 +448,7 @@ async function searchAndAdd(term) {
         idx = hay.indexOf(needle, idx + 1);
       }
     }
+    if (dom[p]) dom[p].redacted = false;
     drawOverlay(p);   // 描画済みページなら即反映（未描画はスクロール時に反映）
   }
   updateCount();
@@ -477,7 +513,7 @@ function attachDraw(p) {
         }
       }
     }
-    start = null; moved = false; d.preview = null; drawOverlay(p); updateCount();
+    start = null; moved = false; d.preview = null; d.redacted = false; drawOverlay(p); updateCount();
   });
 }
 
@@ -511,6 +547,7 @@ $("apply").onclick = async () => {
       const vp1 = page.getViewport({ scale: 1 });   // 元のページ寸法(pt)を保持
       const pg = out.addPage([vp1.width, vp1.height]);
       pg.drawImage(img, { x: 0, y: 0, width: vp1.width, height: vp1.height });
+      markRedacted(p);
       setStatus(`墨消し中… ${p}/${numPages}`);
     }
     out.setTitle(""); out.setAuthor(""); out.setSubject("");
