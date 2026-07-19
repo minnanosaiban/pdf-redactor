@@ -19,11 +19,15 @@
   /* ── サイドバー（Streamlit風） ── */
   .sidebar {
     position: fixed; top: 0; left: 0; bottom: 0; width: 300px; overflow-y: auto;
-    background: #f0f2f6; padding: 22px 20px 48px;
+    background: #f0f2f6; padding: 28px 20px 48px;
+    display: flex; flex-direction: column; gap: 28px;
   }
-  .app-title { font-weight: 700; font-size: 20px; line-height: 1.35; margin-bottom: 2px; }
+  .brand { display: flex; flex-direction: column; gap: 4px; }
+  .app-title {
+    font-weight: 400; font-size: 26px; line-height: 1.35; text-align: center;
+    background: #000; color: #fff; padding: 10px 12px; border-radius: 8px;
+  }
   .app-sub { font-size: 12px; color: #6b6f76; }
-  .hr { height: 1px; background: #e2e4ea; border: 0; margin: 18px 0; }
   .section { display: flex; flex-direction: column; gap: 8px; }
   .shead { font-weight: 700; font-size: 15px; margin: 0 0 2px; }
   .cap { font-size: 12.5px; color: #6b6f76; margin: 4px 0 -2px; }
@@ -77,9 +81,10 @@
 <body>
   <!-- ── サイドバー ── -->
   <aside class="sidebar">
-    <div class="app-title">🖊 PDF 墨消し</div>
-    <div class="app-sub">ブラウザ内で完結・送信なし</div>
-    <div class="hr"></div>
+    <div class="brand">
+      <div class="app-title">PDF 墨消し</div>
+      <div class="app-sub">ブラウザ内で完結・送信なし</div>
+    </div>
 
     <div class="section">
       <div class="shead">■ ファイル</div>
@@ -87,7 +92,6 @@
       <label class="filebtn">📄 PDFを選ぶ<input id="file" type="file" accept="application/pdf"></label>
       <div><span id="ptype" class="badge">—</span></div>
     </div>
-    <div class="hr"></div>
 
     <div class="section">
       <div class="shead">■ 文字で墨消し</div>
@@ -96,7 +100,6 @@
       <button id="search" disabled>🔍 検索して枠追加</button>
       <div class="hint">スキャンPDF（文字なし）では使えません</div>
     </div>
-    <div class="hr"></div>
 
     <div class="section">
       <div class="shead">■ 枠の操作</div>
@@ -105,7 +108,6 @@
       <button id="undo">元に戻す</button>
       <button id="clearAll">全ページの枠を消去</button>
     </div>
-    <div class="hr"></div>
 
     <div class="section">
       <div class="shead">■ 出力</div>
@@ -118,14 +120,13 @@
       <button id="apply" class="primary">墨消しを適用</button>
       <button id="download" disabled>⬇ ダウンロード</button>
     </div>
-    <div class="hr"></div>
 
     <div class="note">処理はすべてお使いのブラウザ内で行われ、<b>PDFはどこにも送信されません</b>。出力は元の画素・文字ごと消えた画像PDFです。</div>
-    <div class="hr"></div>
 
     <div class="section">
       <div class="shead">■ このアプリについて</div>
       <a class="link" href="https://github.com/minnanosaiban/pdf-redactor" target="_blank" rel="noopener">ソースコード（GitHub）↗</a>
+      <a class="link" href="pdf-redactor-offline.html" download>⬇ オフライン版をダウンロード（通信なしで動作）</a>
       <details class="disc">
         <summary>免責事項</summary>
         <div class="disc-body">本ツールは無保証で提供されます（現状有姿）。墨消しは各ページを画像化して黒く塗りつぶす方式ですが、消し忘れ・塗り不足を含め、出力結果の最終確認は利用者の責任で行ってください。処理はお使いのブラウザ内で完結しPDFは外部送信されませんが、ご利用環境に起因する情報漏えいについて作成者は責任を負いません。本ツールの利用により生じたいかなる損害についても作成者は責任を負わず、本ツールは法的助言を提供するものではありません。</div>
