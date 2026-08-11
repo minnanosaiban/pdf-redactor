@@ -30,6 +30,11 @@ const qInput = $("q");
 const ptype = $("ptype");
 
 const setStatus = (m) => { statusEl.textContent = m || ""; };
+// モバイル幅（サイドバーが本文の上に縦積みになるブレークポイント。CSSの@mediaと同じ768px）では、
+// PDF読み込み直後に本文（結果）が画面外にあり「反応がない」ように見えるため、自動で本文へスクロールする。
+const scrollToMain = () => {
+  if (window.matchMedia("(max-width: 768px)").matches) statusEl.scrollIntoView({ behavior: "smooth", block: "start" });
+};
 const rectsOf = (p) => rectsByPage[p] || (rectsByPage[p] = []);
 const totalBoxes = () => Object.values(rectsByPage).reduce((n, a) => n + a.length, 0);
 const updateCount = () => { countEl.textContent = `枠: ${totalBoxes()}`; };
@@ -82,6 +87,7 @@ async function loadFile(file) {
     ? "文字入りPDFです。上の検索で文字を指定して墨消し、または各ページをドラッグで墨消しできます。"
     : "スキャンPDF（文字なし）です。文字検索は使えません。各ページをドラッグで墨消ししてください。";
   setStatus(`${file.name}（${numPages}ページ）を読み込みました。${mode} 枠はクリックで削除。`);
+  scrollToMain();
 }
 
 async function detectSearchable() {
