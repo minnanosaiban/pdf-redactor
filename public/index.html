@@ -51,7 +51,7 @@
   .sidebar .row button { width: auto; flex: 1 1 0; min-width: 0; }
   .shead { font-weight: 700; font-size: 15px; margin: 0 0 2px; }
   .cap { font-size: 12.5px; color: #6b6f76; margin: 4px 0 -2px; }
-  .hint { font-size: 11.5px; color: #8a8f98; }
+  .hint { font-size: 12.5px; color: #8a8f98; }
 
   .sidebar .filebtn, .sidebar button, .sidebar input[type="text"], .sidebar select, .sidebar textarea {
     width: 100%; font-size: 14px; border-radius: 8px; border: 1px solid #d5d7dd;
@@ -150,13 +150,13 @@
 
     <div class="section">
       <div class="shead">■ PDF出力</div>
-      <div class="cap">出力解像度</div>
+      <div class="cap">※出力解像度</div>
       <select id="dpi">
         <option value="150">150dpi（軽い）</option>
         <option value="200" selected>200dpi（標準）</option>
         <option value="300">300dpi（高精細）</option>
       </select>
-      <div class="cap">タイトル（任意・Google検索結果に使われます）</div>
+      <div class="cap">※タイトル（任意・Google検索結果に使われます）</div>
       <textarea id="metaTitle" placeholder="例: ENEOS（エネオス）第１準備書面　内部通報制度裁判　"></textarea>
       <button id="apply" class="primary">墨消しを適用</button>
       <button id="download" disabled>
