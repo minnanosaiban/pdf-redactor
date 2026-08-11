@@ -22,6 +22,7 @@
   - 出力は画像PDFになるため、**元の文字・画素は一切含まれません＝確実に墨消しできます**。
   - 元PDFのメタデータも引き継がれません。
 - React / Next.js は使用していません（素のHTML＋バニラJSで実装しています）。
+- アイコンは Bootstrap Icons（MIT License）から使う分だけSVGをそのまま埋め込んでいます。CDN・Webフォントは不使用です。詳細は [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) を参照してください。
 
 ## オフライン版
 

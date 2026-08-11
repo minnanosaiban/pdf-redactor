@@ -52,7 +52,11 @@
     width: 100%; font-size: 14px; border-radius: 8px; border: 1px solid #d5d7dd;
     background: #fff; color: #31333f; font-family: inherit;
   }
-  .sidebar .filebtn, .sidebar button { padding: 9px 12px; text-align: center; cursor: pointer; font-weight: 500; }
+  .sidebar .filebtn, .sidebar button {
+    padding: 9px 12px; cursor: pointer; font-weight: 500;
+    display: flex; align-items: center; justify-content: center; gap: 7px;
+  }
+  .icon { width: 1em; height: 1em; flex: none; }
   .sidebar input[type="text"], .sidebar select, .sidebar textarea { padding: 9px 10px; }
   .sidebar textarea { height: 108px; resize: none; line-height: 1.5; }
   .sidebar .filebtn:hover, .sidebar button:hover:not(:disabled) { border-color: #ff4b4b; color: #ff4b4b; }
@@ -69,6 +73,12 @@
   .note { font-size: 12px; color: #6b6f76; line-height: 1.55; }
   .link { font-size: 13px; color: #1f6feb; text-decoration: none; }
   .link:hover { text-decoration: underline; }
+  .gh-link {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 28px; height: 28px; margin: -2px 0; border-radius: 6px; color: #31333f;
+  }
+  .gh-link .icon { width: 18px; height: 18px; }
+  .gh-link:hover { color: #ff4b4b; background: #e6e8ee; }
   .disc { font-size: 12px; color: #6b6f76; }
   .disc summary { cursor: pointer; color: #31333f; font-weight: 600; font-size: 12.5px; }
   .disc .disc-body { margin-top: 6px; line-height: 1.6; }
@@ -104,7 +114,14 @@
 
     <div class="section">
       <div class="shead">■ ファイル選択</div>
-      <label class="filebtn">📄 PDFを選ぶ<input id="file" type="file" accept="application/pdf"></label>
+      <label class="filebtn">
+        <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+          <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2M9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5z"/>
+          <path d="M4.603 14.087a.8.8 0 0 1-.438-.42c-.195-.388-.13-.776.08-1.102.198-.307.526-.568.897-.787a7.7 7.7 0 0 1 1.482-.645a20 20 0 0 0 1.062-2.227a7.3 7.3 0 0 1-.43-1.295c-.086-.4-.119-.796-.046-1.136.075-.354.274-.672.65-.823.192-.077.4-.12.602-.077a.7.7 0 0 1 .477.365c.088.164.12.356.127.538.007.188-.012.396-.047.614-.084.51-.27 1.134-.52 1.794a11 11 0 0 0 .98 1.686a5.8 5.8 0 0 1 1.334.05c.364.066.734.195.96.465.12.144.193.32.2.518.007.192-.047.382-.138.563a1.04 1.04 0 0 1-.354.416a.86.86 0 0 1-.51.138c-.331-.014-.654-.196-.933-.417a5.7 5.7 0 0 1-.911-.95a11.7 11.7 0 0 0-1.997.406a11.3 11.3 0 0 1-1.02 1.51c-.292.35-.609.656-.927.787a.8.8 0 0 1-.58.029m1.379-1.901q-.25.115-.459.238c-.328.194-.541.383-.647.547-.094.145-.096.25-.04.361q.016.032.026.044l.035-.012c.137-.056.355-.235.635-.572a8 8 0 0 0 .45-.606m1.64-1.33a13 13 0 0 1 1.01-.193a12 12 0 0 1-.51-.858a21 21 0 0 1-.5 1.05zm2.446.45q.226.245.435.41c.24.19.407.253.498.256a.1.1 0 0 0 .07-.015a.3.3 0 0 0 .094-.125a.44.44 0 0 0 .059-.2a.1.1 0 0 0-.026-.063c-.052-.062-.2-.152-.518-.209a4 4 0 0 0-.612-.053zM8.078 7.8a7 7 0 0 0 .2-.828q.046-.282.038-.465a.6.6 0 0 0-.032-.198a.5.5 0 0 0-.145.04c-.087.035-.158.106-.196.283-.04.192-.03.469.046.822q.036.167.09.346z"/>
+        </svg>
+        <span>PDFを選ぶ</span>
+        <input id="file" type="file" accept="application/pdf">
+      </label>
       <div><span id="ptype" class="badge">—</span></div>
     </div>
 
@@ -138,7 +155,13 @@
       <div class="cap">タイトル（任意・Google検索結果に使われます）</div>
       <textarea id="metaTitle" placeholder="例: ENEOS（エネオス）第１準備書面　内部通報制度裁判　"></textarea>
       <button id="apply" class="primary">墨消しを適用</button>
-      <button id="download" disabled>⬇ ダウンロード</button>
+      <button id="download" disabled>
+        <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+          <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5"/>
+          <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708z"/>
+        </svg>
+        <span>ダウンロード</span>
+      </button>
     </div>
 
     <div class="note">処理はすべてお使いのブラウザ内で行われ、<b>PDFはどこにも送信されません</b>。出力は元の画素・文字ごと消えた画像PDFです。</div>
@@ -146,16 +169,20 @@
     <div class="section">
       <div class="shead">■ このアプリについて</div>
       <div class="cap">※スキャンPDF・サーチャブルPDFの墨消しをするアプリです。オフライン版も用意しています。</div>
-      <a class="link" href="pdf-redactor-offline.html" download>⬇ オフライン版をダウンロード</a>
+      <a class="link" href="pdf-redactor-offline.html" download><svg class="icon" style="vertical-align:-0.15em" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5"/><path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708z"/></svg> オフライン版をダウンロード</a>
     </div>
 
     <div class="section">
       <div class="shead">■ 免責事項</div>
       <div class="cap">※本ツールは無保証で提供されます（現状有姿）。なお、本アプリのコードは GitHub に公開しています。</div>
+      <a class="gh-link" href="https://github.com/minnanosaiban/pdf-redactor" target="_blank" rel="noopener" title="ソースコード（GitHub）" aria-label="ソースコード（GitHub）">
+        <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+          <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8"/>
+        </svg>
+      </a>
       <div class="cap">※処理はお使いのブラウザ内で完結しPDFは外部送信されませんが、ご利用環境に起因する情報漏えいについて作成者は責任を負いません。</div>
       <div class="cap">※本ツールの利用により生じたいかなる損害についても作成者は責任を負わず、本ツールは法的助言を提供するものではありません。</div>
       <div class="cap">※墨消しは各ページを画像化して黒く塗りつぶす方式です。消し忘れ・塗り不足を含め、出力結果の最終確認は利用者の責任で行ってください。</div>
-      <a class="link" href="https://github.com/minnanosaiban/pdf-redactor" target="_blank" rel="noopener">ソースコード（GitHub）↗</a>
     </div>
   </aside>
 
