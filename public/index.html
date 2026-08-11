@@ -24,6 +24,7 @@
 <style>
   :root { color-scheme: light; }
   * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
   body {
     margin: 0; color: #31333f; background: #fff;
     font-family: "Source Sans Pro", system-ui, "Segoe UI", "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
@@ -41,6 +42,10 @@
     background: #000; color: #fff; padding: 10px 12px; border-radius: 8px;
   }
   .app-sub { font-size: 12px; color: #6b6f76; }
+  .app-sub a { color: #1f6feb; text-decoration: none; }
+  .app-sub a:hover { text-decoration: underline; }
+  #secondary-info { display: flex; flex-direction: column; gap: 28px; }
+  .main #secondary-info { margin-top: 32px; }
   .section { display: flex; flex-direction: column; gap: 8px; }
   .row { display: flex; gap: 8px; }
   .sidebar .row button { width: auto; flex: 1 1 0; min-width: 0; }
@@ -109,7 +114,7 @@
   <aside class="sidebar">
     <div class="brand">
       <div class="app-title">PDF 墨消し</div>
-      <div class="app-sub">※外部への送信はなくブラウザ内で完結するアプリです。ご利用前に免責事項をご覧ください。</div>
+      <div class="app-sub">※外部への送信はなくブラウザ内で完結するアプリです。ご利用前に<a href="#disclaimer">免責事項</a>をご覧ください。</div>
     </div>
 
     <div class="section">
@@ -166,23 +171,25 @@
 
     <div class="note">処理はすべてお使いのブラウザ内で行われ、<b>PDFはどこにも送信されません</b>。出力は元の画素・文字ごと消えた画像PDFです。</div>
 
-    <div class="section">
-      <div class="shead">■ このアプリについて</div>
-      <div class="cap">※スキャンPDF・サーチャブルPDFの墨消しをするアプリです。オフライン版も用意しています。</div>
-      <a class="link" href="pdf-redactor-offline.html" download><svg class="icon" style="vertical-align:-0.15em" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5"/><path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708z"/></svg> オフライン版をダウンロード</a>
-    </div>
+    <div id="secondary-info">
+      <div class="section">
+        <div class="shead">■ このアプリについて</div>
+        <div class="cap">※スキャンPDF・サーチャブルPDFの墨消しをするアプリです。オフライン版も用意しています。</div>
+        <a class="link" href="pdf-redactor-offline.html" download><svg class="icon" style="vertical-align:-0.15em" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5"/><path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708z"/></svg> オフライン版をダウンロード</a>
+      </div>
 
-    <div class="section">
-      <div class="shead">■ 免責事項</div>
-      <div class="cap">※本ツールは無保証で提供されます（現状有姿）。なお、本アプリのコードは GitHub に公開しています。</div>
-      <a class="gh-link" href="https://github.com/minnanosaiban/pdf-redactor" target="_blank" rel="noopener" title="ソースコード（GitHub）" aria-label="ソースコード（GitHub）">
-        <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
-          <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8"/>
-        </svg>
-      </a>
-      <div class="cap">※処理はお使いのブラウザ内で完結しPDFは外部送信されませんが、ご利用環境に起因する情報漏えいについて作成者は責任を負いません。</div>
-      <div class="cap">※本ツールの利用により生じたいかなる損害についても作成者は責任を負わず、本ツールは法的助言を提供するものではありません。</div>
-      <div class="cap">※墨消しは各ページを画像化して黒く塗りつぶす方式です。消し忘れ・塗り不足を含め、出力結果の最終確認は利用者の責任で行ってください。</div>
+      <div class="section" id="disclaimer">
+        <div class="shead">■ 免責事項</div>
+        <div class="cap">※本ツールは無保証で提供されます（現状有姿）。なお、本アプリのコードは GitHub に公開しています。</div>
+        <a class="gh-link" href="https://github.com/minnanosaiban/pdf-redactor" target="_blank" rel="noopener" title="ソースコード（GitHub）" aria-label="ソースコード（GitHub）">
+          <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+            <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8"/>
+          </svg>
+        </a>
+        <div class="cap">※処理はお使いのブラウザ内で完結しPDFは外部送信されませんが、ご利用環境に起因する情報漏えいについて作成者は責任を負いません。</div>
+        <div class="cap">※本ツールの利用により生じたいかなる損害についても作成者は責任を負わず、本ツールは法的助言を提供するものではありません。</div>
+        <div class="cap">※墨消しは各ページを画像化して黒く塗りつぶす方式です。消し忘れ・塗り不足を含め、出力結果の最終確認は利用者の責任で行ってください。</div>
+      </div>
     </div>
   </aside>
 
