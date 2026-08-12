@@ -65,6 +65,8 @@
   .icon { width: 1em; height: 1em; flex: none; }
   .sidebar input[type="text"], .sidebar select, .sidebar textarea { padding: 9px 10px; }
   .sidebar textarea { height: 108px; resize: none; line-height: 1.5; }
+  /* タイトルは「墨消し適用」を押す前に入力してほしいので、未入力の間は枠を赤くして目立たせる */
+  #metaTitle:placeholder-shown { border-color: #ff4b4b; }
   .sidebar .filebtn:hover, .sidebar button:hover:not(:disabled) { border-color: #ff4b4b; color: #ff4b4b; }
   .sidebar button.primary { background: #ff4b4b; border-color: #ff4b4b; color: #fff; font-weight: 600; }
   .sidebar button.primary:hover:not(:disabled) { background: #e63c3c; color: #fff; }
