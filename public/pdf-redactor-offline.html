@@ -114,6 +114,7 @@
   .sidebar .row button { width: auto; flex: 1 1 0; min-width: 0; }
   .shead { font-weight: 700; font-size: 15px; margin: 0 0 2px; }
   .cap { font-size: 12.5px; color: #6b6f76; margin: 4px 0 -2px; }
+  #applyStatus { margin: 0; min-height: 16px; line-height: 1.5; }
   .hint { font-size: 12.5px; color: #8a8f98; }
 
   .sidebar .filebtn, .sidebar button, .sidebar input[type="text"], .sidebar select, .sidebar textarea {
@@ -221,7 +222,7 @@
       </select>
       <div class="cap">※タイトル（任意・Google検索結果に使われます）</div>
       <textarea id="metaTitle" placeholder="例: ENEOS（エネオス）第１準備書面　内部通報制度裁判　"></textarea>
-      <div class="cap">※墨消し適用からダウンロードできるようになるまで、ページ数や解像度によっては時間がかかります</div>
+      <div class="cap">※「墨消し適用」「ダウンロード」とも、ページ数や解像度によっては時間がかかります</div>
       <div class="row">
         <button id="apply" class="primary">
           <span>墨消し適用</span>
@@ -234,6 +235,7 @@
           <span>ダウンロード</span>
         </button>
       </div>
+      <div id="applyStatus" class="cap" aria-live="polite"></div>
     </div>
 
     <div id="secondary-info">
@@ -288,12 +290,13 @@ const dom = {};              // { ページ番号: {wrap,stage,view,overlay,rend
 const history = [];          // 枠を追加した順のページ番号（「元に戻す」用）
 let io = null;               // IntersectionObserver（遅延レンダリング）
 let applying = false;        // 墨消し適用中フラグ
-let outputBlob = null;
+let outDoc = null;           // 墨消し適用済みのPDFDocument（タイトルはダウンロード時に書き込んで保存する）
 
 // ---- 要素 ----
 const $ = (id) => document.getElementById(id);
 const pagesEl = $("pages");
 const statusEl = $("status");
+const applyStatusEl = $("applyStatus");
 const countEl = $("count");
 const dlBtn = $("download");
 const dpiSel = $("dpi");
@@ -301,6 +304,9 @@ const qInput = $("q");
 const ptype = $("ptype");
 
 const setStatus = (m) => { statusEl.textContent = m || ""; };
+// 「墨消し適用」「ダウンロード」の進捗・結果は、本文上部の setStatus ではなく
+// ボタンのすぐ下（サイドバー内）に出す。
+const setApplyStatus = (m) => { applyStatusEl.textContent = m || ""; };
 // モバイル幅（サイドバーが本文の上に縦積みになるブレークポイント。CSSの@mediaと同じ768px）の判定。
 const mobileQuery = window.matchMedia("(max-width: 768px)");
 // PDF読み込み直後に本文（結果）が画面外にあり「反応がない」ように見えるため、自動で本文へスクロールする。
@@ -342,7 +348,7 @@ qInput.addEventListener("keydown", (e) => { if (e.key === "Enter") searchAndAdd(
 
 // ---- 読み込み ----
 async function loadFile(file) {
-  outputBlob = null; dlBtn.disabled = true;
+  outDoc = null; dlBtn.disabled = true; setApplyStatus("");
   if (io) { io.disconnect(); io = null; }
   pagesEl.innerHTML = "";
   for (const k of Object.keys(rectsByPage)) delete rectsByPage[k];
@@ -599,14 +605,15 @@ function attachDraw(p) {
 
 // ---- 墨消し適用（各ページをラスタライズ＋黒塗りして新規PDFを生成） ----
 $("apply").onclick = async () => {
-  if (!pdf) { setStatus("先にPDFを選んでください。"); return; }
+  if (!pdf) { setApplyStatus("先にPDFを選んでください。"); return; }
   const total = totalBoxes();
   const dpi = parseInt(dpiSel.value, 10);
   const scale = dpi / 72;
   dlBtn.disabled = true;
+  outDoc = null;
   applying = true;
   if (io) io.disconnect();            // 適用中は遅延レンダリングを止める
-  setStatus(`墨消しを適用中…（${total}枠 / ${dpi}dpi）`);
+  setApplyStatus(`墨消しを適用中…（${total}枠 / ${dpi}dpi）`);
   try {
     const out = await PDFDocument.create();
     for (let p = 1; p <= numPages; p++) {
@@ -628,29 +635,40 @@ $("apply").onclick = async () => {
       const pg = out.addPage([vp1.width, vp1.height]);
       pg.drawImage(img, { x: 0, y: 0, width: vp1.width, height: vp1.height });
       markRedacted(p);
-      setStatus(`墨消し中… ${p}/${numPages}`);
+      setApplyStatus(`墨消し中… ${p}/${numPages}`);
     }
-    out.setTitle($("metaTitle").value.replace(/\s+/g, " ").trim());
     out.setAuthor(""); out.setSubject("");
     out.setKeywords([]); out.setProducer("pdf-redactor"); out.setCreator("pdf-redactor");
-    setStatus("PDFを書き出し中…（ページ数や解像度によっては時間がかかります）");
-    const outBytes = await out.save();
-    outputBlob = new Blob([outBytes], { type: "application/pdf" });
+    // タイトルはここでは書き込まない。「ダウンロード」を押した時点のタイトル欄の値を
+    // 使って書き込む（PDFへの書き出し＝out.save()自体もダウンロード時にまとめて行う）ので、
+    // 墨消し適用後にタイトルを直しても、あるいは書き忘れても反映される。
+    outDoc = out;
     dlBtn.disabled = false;
-    setStatus(`完了：${numPages}ページをラスタライズし ${total}箇所を黒塗りしました。下地の画素・文字は出力に含まれません（出力は画像PDF＝文字検索不可）。DL後、PDFを開いて墨消し漏れがないか目視確認してください。`);
+    setApplyStatus(`完了：${numPages}ページをラスタライズし ${total}箇所を黒塗りしました。下地の画素・文字は出力に含まれません（出力は画像PDF＝文字検索不可）。「ダウンロード」を押すとPDFファイルに書き出されます。`);
   } finally {
     applying = false;
     if (io) for (const k of Object.keys(dom)) io.observe(dom[k].wrap);   // 遅延レンダリング再開
   }
 };
 
-dlBtn.onclick = () => {
-  if (!outputBlob) return;
-  const url = URL.createObjectURL(outputBlob);
-  const a = document.createElement("a");
-  a.href = url; a.download = "redacted.pdf";
-  document.body.appendChild(a); a.click(); a.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 5000);
+dlBtn.onclick = async () => {
+  if (!outDoc) return;
+  dlBtn.disabled = true;
+  setApplyStatus("PDFに書き出し中…（ページ数や解像度によっては時間がかかります）");
+  try {
+    // タイトルはこの時点（ダウンロードを押した時点）のタイトル欄の値を書き込む。
+    outDoc.setTitle($("metaTitle").value.replace(/\s+/g, " ").trim());
+    const outBytes = await outDoc.save();
+    const blob = new Blob([outBytes], { type: "application/pdf" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = "redacted.pdf";
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 5000);
+    setApplyStatus("ダウンロードしました。開いて墨消し漏れがないか目視確認してください。");
+  } finally {
+    dlBtn.disabled = false;
+  }
 };
 
 </script>
