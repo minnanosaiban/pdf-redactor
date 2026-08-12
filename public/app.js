@@ -362,6 +362,7 @@ $("apply").onclick = async () => {
     out.setTitle($("metaTitle").value.replace(/\s+/g, " ").trim());
     out.setAuthor(""); out.setSubject("");
     out.setKeywords([]); out.setProducer("pdf-redactor"); out.setCreator("pdf-redactor");
+    setStatus("PDFを書き出し中…（ページ数や解像度によっては時間がかかります）");
     const outBytes = await out.save();
     outputBlob = new Blob([outBytes], { type: "application/pdf" });
     dlBtn.disabled = false;
