@@ -17,7 +17,7 @@ const dom = {};              // { ページ番号: {wrap,stage,view,overlay,rend
 const history = [];          // 枠を追加した順のページ番号（「元に戻す」用）
 let io = null;               // IntersectionObserver（遅延レンダリング）
 let applying = false;        // 墨消し適用中フラグ
-let outDoc = null;           // 墨消し適用済みのPDFDocument（タイトルはダウンロード時に書き込んで保存する）
+let outputBlob = null;       // 墨消し適用済みPDFのBlob（タイトルも書き込み済み。ダウンロードは即トリガーするだけ）
 
 // ---- 要素 ----
 const $ = (id) => document.getElementById(id);
@@ -75,7 +75,7 @@ qInput.addEventListener("keydown", (e) => { if (e.key === "Enter") searchAndAdd(
 
 // ---- 読み込み ----
 async function loadFile(file) {
-  outDoc = null; dlBtn.disabled = true; setApplyStatus("");
+  outputBlob = null; dlBtn.disabled = true; setApplyStatus("");
   if (io) { io.disconnect(); io = null; }
   pagesEl.innerHTML = "";
   for (const k of Object.keys(rectsByPage)) delete rectsByPage[k];
@@ -337,7 +337,7 @@ $("apply").onclick = async () => {
   const dpi = parseInt(dpiSel.value, 10);
   const scale = dpi / 72;
   dlBtn.disabled = true;
-  outDoc = null;
+  outputBlob = null;
   applying = true;
   if (io) io.disconnect();            // 適用中は遅延レンダリングを止める
   setApplyStatus(`墨消しを適用中…（${total}枠 / ${dpi}dpi）`);
@@ -364,36 +364,28 @@ $("apply").onclick = async () => {
       markRedacted(p);
       setApplyStatus(`墨消し中… ${p}/${numPages}`);
     }
+    out.setTitle($("metaTitle").value.replace(/\s+/g, " ").trim());
     out.setAuthor(""); out.setSubject("");
     out.setKeywords([]); out.setProducer("pdf-redactor"); out.setCreator("pdf-redactor");
-    // タイトルはここでは書き込まない。「ダウンロード」を押した時点のタイトル欄の値を
-    // 使って書き込む（PDFへの書き出し＝out.save()自体もダウンロード時にまとめて行う）ので、
-    // 墨消し適用後にタイトルを直しても、あるいは書き忘れても反映される。
-    outDoc = out;
+    const outBytes = await out.save();
+    outputBlob = new Blob([outBytes], { type: "application/pdf" });
     dlBtn.disabled = false;
-    setApplyStatus(`完了：${numPages}ページをラスタライズし ${total}箇所を黒塗りしました。下地の画素・文字は出力に含まれません（出力は画像PDF＝文字検索不可）。「ダウンロード」を押すとPDFファイルに書き出されます。`);
+    setApplyStatus(`完了：${numPages}ページをラスタライズし ${total}箇所を黒塗りしました。下地の画素・文字は出力に含まれません（出力は画像PDF＝文字検索不可）。DL後、PDFを開いて墨消し漏れがないか目視確認してください。`);
   } finally {
     applying = false;
     if (io) for (const k of Object.keys(dom)) io.observe(dom[k].wrap);   // 遅延レンダリング再開
   }
 };
 
-dlBtn.onclick = async () => {
-  if (!outDoc) return;
-  dlBtn.disabled = true;
-  setApplyStatus("PDFに書き出し中…（ページ数や解像度によっては時間がかかります）");
-  try {
-    // タイトルはこの時点（ダウンロードを押した時点）のタイトル欄の値を書き込む。
-    outDoc.setTitle($("metaTitle").value.replace(/\s+/g, " ").trim());
-    const outBytes = await outDoc.save();
-    const blob = new Blob([outBytes], { type: "application/pdf" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url; a.download = "redacted.pdf";
-    document.body.appendChild(a); a.click(); a.remove();
-    setTimeout(() => URL.revokeObjectURL(url), 5000);
-    setApplyStatus("ダウンロードしました。開いて墨消し漏れがないか目視確認してください。");
-  } finally {
-    dlBtn.disabled = false;
-  }
+// ダウンロードは a要素のclickをユーザー操作に対して同期的に呼ぶ必要がある
+// （非同期処理を挟むとブラウザによってはダウンロードが黙って無視される）ため、
+// PDFの書き出し（タイトル書き込み含む）は上の「墨消し適用」側で終わらせておき、
+// ここでは何も待たずに即ダウンロードを開始する。
+dlBtn.onclick = () => {
+  if (!outputBlob) return;
+  const url = URL.createObjectURL(outputBlob);
+  const a = document.createElement("a");
+  a.href = url; a.download = "redacted.pdf";
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 5000);
 };
