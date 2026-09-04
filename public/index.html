@@ -9,14 +9,17 @@
 <meta property="og:url" content="https://pdf-redactor.pages.dev/">
 <meta property="og:title" content="PDF 墨消しアプリ">
 <meta property="og:description" content="スキャンPDFの氏名・住所などをブラウザだけで黒塗り。送信なし・ローカルで完結、オフライン版もあります。">
-<meta property="og:image" content="https://pdf-redactor.pages.dev/og-image-large.png">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta property="og:image:type" content="image/png">
-<!-- 正方形寄りのプレビュー（LINE等）向けの2枚目のog:image。1枚目(大)を優先し、こちらは
-     summary型で拾われた場合の予備。OGPは複数og:imageを許容する仕様。 -->
+<!-- og:imageは正方形を1枚目に置く。多くのクローラー(Teams等)は複数og:imageのうち
+     1枚目を機械的に使い、小さいサムネイル枠では中央を正方形にトリミングする。1枚目が
+     横長(1200x630)だと左右の端が切れてタイトル文字が欠ける実害を確認したため、
+     先に正方形(テキストが中央2行で安全)を置き、横長は2枚目に回す。
+     Twitterはtwitter:image(別タグ)を見るため、この並びの影響を受けず横長のまま表示される。 -->
 <meta property="og:image" content="https://pdf-redactor.pages.dev/og-image-square.png">
 <meta property="og:image:width" content="630">
+<meta property="og:image:height" content="630">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image" content="https://pdf-redactor.pages.dev/og-image-large.png">
+<meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:type" content="image/png">
 <meta name="twitter:card" content="summary_large_image">
