@@ -7,7 +7,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTIiIGZpbGw9IiMwMDAiLz4KICA8dGV4dCB4PSIzMiIgeT0iMzQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJjZW50cmFsIgogICAgICAgIGZvbnQtZmFtaWx5PSInSGlyYWdpbm8gU2FucycsJ0hpcmFnaW5vIEtha3UgR290aGljIFByb04nLCdZdSBHb3RoaWMnLE1laXJ5byxzYW5zLXNlcmlmIgogICAgICAgIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iNDYiIGZpbGw9IiNmZmYiPuWiqDwvdGV4dD4KPC9zdmc+Cg==">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://pdf-redactor.pages.dev/">
-<meta property="og:title" content="PDF 墨消しアプリ">
+<meta property="og:title" content="PDF 墨消しツール">
 <meta property="og:description" content="スキャンPDFの氏名・住所などをブラウザだけで黒塗り。送信なし・ローカルで完結、オフライン版もあります。">
 <!-- og:imageは正方形を1枚目に置く。多くのクローラー(Teams等)は複数og:imageのうち
      1枚目を機械的に使い、小さいサムネイル枠では中央を正方形にトリミングする。1枚目が
@@ -23,7 +23,7 @@
 <meta property="og:image:height" content="630">
 <meta property="og:image:type" content="image/png">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="PDF 墨消しアプリ">
+<meta name="twitter:title" content="PDF 墨消しツール">
 <meta name="twitter:description" content="スキャンPDFの氏名・住所などをブラウザだけで黒塗り。送信なし・ローカルで完結、オフライン版もあります。">
 <meta name="twitter:image" content="https://pdf-redactor.pages.dev/og-image-large.png">
 <!-- ライブラリはCDN。プライバシー用途なので後でローカルに同梱(vendor)する予定。
@@ -188,7 +188,7 @@
   <aside class="sidebar">
     <div class="brand">
       <div class="app-title">PDF 墨消し</div>
-      <div class="app-sub">※外部への送信はなくローカルで完結するアプリです。ご利用前に<a href="#disclaimer">免責事項</a>をご覧ください。</div>
+      <div class="app-sub">※外部への送信はなくローカルで完結するツールです。ご利用前に<a href="#disclaimer">免責事項</a>をご覧ください。</div>
     </div>
 
     <div class="section">
@@ -251,15 +251,15 @@
 
     <div id="secondary-info">
       <div class="section">
-        <div class="shead">■ このアプリについて</div>
-        <div class="cap">※スキャンPDF・サーチャブルPDFの墨消しをするアプリです。オフライン版も用意しています。</div>
+        <div class="shead">■ このツールについて</div>
+        <div class="cap">※スキャンPDF・サーチャブルPDFの墨消しをするツールです。オフライン版も用意しています。</div>
         <div class="cap">※ご意見・ご要望は作成者までご連絡ください</div>
         <a class="link" href="https://x.com/minnanosaiban" target="_blank" rel="noopener"><svg class="icon" style="vertical-align:-0.15em" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true"><path d="M12.6.75h2.454l-5.36 6.142L16 15.25h-4.937l-3.867-5.07-4.425 5.07H.316l5.733-6.57L0 .75h5.063l3.495 4.633L12.601.75Zm-.86 13.028h1.36L4.323 2.145H2.865z"/></svg> @minnanosaiban</a>
       </div>
 
       <div class="section" id="disclaimer">
         <div class="shead">■ 免責事項</div>
-        <div class="cap">※本ツールは無保証で提供されます（現状有姿）。なお、本アプリのコードは GitHub に公開しています。</div>
+        <div class="cap">※本ツールは無保証で提供されます（現状有姿）。なお、コードは GitHub に公開しています。</div>
         <a class="gh-link" href="https://github.com/minnanosaiban/pdf-redactor" target="_blank" rel="noopener" title="ソースコード（GitHub）" aria-label="ソースコード（GitHub）">
           <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
             <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8"/>
@@ -325,7 +325,7 @@ const scrollToMain = () => {
   if (mobileQuery.matches) statusEl.scrollIntoView({ behavior: "smooth", block: "start" });
 };
 
-// 「このアプリについて」「免責事項」は、モバイル幅では情報より先に操作・結果を見せたいので
+// 「このツールについて」「免責事項」は、モバイル幅では情報より先に操作・結果を見せたいので
 // プレビュー（本文）の下へ実際に移動し、デスクトップ幅ではサイドバー内の元の位置に戻す。
 // 複製はしない（免責事項へのリンク先要素が常に1つだけになるようにするため）。
 const secondaryInfo = $("secondary-info");

@@ -41,7 +41,7 @@ const scrollToMain = () => {
   if (mobileQuery.matches) statusEl.scrollIntoView({ behavior: "smooth", block: "start" });
 };
 
-// 「このアプリについて」「免責事項」は、モバイル幅では情報より先に操作・結果を見せたいので
+// 「このツールについて」「免責事項」は、モバイル幅では情報より先に操作・結果を見せたいので
 // プレビュー（本文）の下へ実際に移動し、デスクトップ幅ではサイドバー内の元の位置に戻す。
 // 複製はしない（免責事項へのリンク先要素が常に1つだけになるようにするため）。
 const secondaryInfo = $("secondary-info");

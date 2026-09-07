@@ -61,8 +61,8 @@ def make_square():
 def make_large():
     w, h = 1200, 630
     pad_x_title, pad_x_sub, gap = 90, 90, 40
-    title = "PDF墨消しアプリ"
-    subtitle = "PDFの個人情報等を「墨消し機能」で完全に消すアプリです"
+    title = "PDF墨消しツール"
+    subtitle = "PDFの個人情報等を「墨消し機能」で完全に消すツールです"
 
     scratch = ImageDraw.Draw(Image.new("RGB", (10, 10)))
     title_font, tb, title_size = fit(scratch, title, w - 2 * pad_x_title, 200)
