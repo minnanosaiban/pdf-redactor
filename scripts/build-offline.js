@@ -64,7 +64,7 @@ out = out.replace(
   '<script src="app.js"></script>',
   () => `<script>\n${escapeScriptClose(appJsOffline)}\n</script>`
 );
-out = out.replace("<title>PDF 墨消し</title>", () => "<title>PDF 墨消し（オフライン版）</title>");
+out = out.replace("<title>PDF墨消し</title>", () => "<title>PDF墨消し（オフライン版）</title>");
 // favicon も外部ファイル参照だと file:// 単体配布時に読み込めないため data URI に埋め込む
 const faviconDataUri = `data:image/svg+xml;base64,${favicon.toString("base64")}`;
 out = out.replace('<link rel="icon" type="image/svg+xml" href="favicon.svg">', () => `<link rel="icon" type="image/svg+xml" href="${faviconDataUri}">`);
