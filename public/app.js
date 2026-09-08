@@ -151,7 +151,7 @@ function buildPages(w, h) {
     wrap.appendChild(head); wrap.appendChild(stage);
     pagesEl.appendChild(wrap);
 
-    dom[p] = { wrap, stage, view, overlay, rendered: false, rendering: false, preview: null, redacted: false };
+    dom[p] = { wrap, stage, view, overlay, rendered: false, rendering: false, preview: null, redacted: false, hoverIndex: -1 };
     attachDraw(p);
   }
 }
@@ -205,8 +205,34 @@ function drawOverlay(p) {
   const [fill, stroke] = d.redacted
     ? ["rgba(0,0,0,0.95)", "rgba(0,0,0,1)"]
     : ["rgba(220,0,0,0.35)", "rgba(220,0,0,0.9)"];
-  for (const r of rectsOf(p)) draw(r, fill, stroke);
+  const rects = rectsOf(p);
+  rects.forEach((r, i) => {
+    draw(r, fill, stroke);
+    // 枠にカーソルが乗っている間は「クリックで削除できる」ことが分かるよう×印を出す
+    if (i === d.hoverIndex) drawDeleteHint(ctx, r, W, H);
+  });
   if (d.preview) draw(d.preview, "rgba(0,0,0,0.25)", "rgba(0,0,0,0.7)");
+}
+
+// 枠の右上に削除ヒント（白丸+×）を描く。枠自体はクリックでどこでも削除可能（挙動は変えず、目印だけ追加）。
+function drawDeleteHint(ctx, r, W, H) {
+  const rad = 9;
+  const cx = Math.min(Math.max((r.x + r.w) * W, rad), W - rad);
+  const cy = Math.min(Math.max(r.y * H, rad), H - rad);
+  ctx.beginPath();
+  ctx.arc(cx, cy, rad, 0, Math.PI * 2);
+  ctx.fillStyle = "#fff";
+  ctx.fill();
+  ctx.lineWidth = 1.5;
+  ctx.strokeStyle = "rgba(0,0,0,.25)";
+  ctx.stroke();
+  const k = rad * 0.45;
+  ctx.beginPath();
+  ctx.moveTo(cx - k, cy - k); ctx.lineTo(cx + k, cy + k);
+  ctx.moveTo(cx + k, cy - k); ctx.lineTo(cx - k, cy + k);
+  ctx.strokeStyle = "#31333f";
+  ctx.lineWidth = 2;
+  ctx.stroke();
 }
 
 // 赤枠→黒塗りへ短いアニメーションで遷移させる（「墨消しを適用」の視覚フィードバック用）
@@ -288,6 +314,15 @@ function itemRect(it, start, end, vp) {
   return { x, y, w, h };
 }
 
+// 枠配列の中から座標qに当たる枠のインデックスを返す（重なりは最後に追加＝最前面のものを優先）
+function hitIndex(arr, q) {
+  for (let i = arr.length - 1; i >= 0; i--) {
+    const r = arr[i];
+    if (q.x >= r.x && q.x <= r.x + r.w && q.y >= r.y && q.y <= r.y + r.h) return i;
+  }
+  return -1;
+}
+
 // ---- 各ページの描画操作（ドラッグ追加 / クリック削除） ----
 function attachDraw(p) {
   const d = dom[p], o = d.overlay;
@@ -304,10 +339,20 @@ function attachDraw(p) {
     start = norm(e); moved = false;
   });
   o.addEventListener("pointermove", (e) => {
-    if (!start) return;
     const q = norm(e);
-    if (Math.abs(q.x - start.x) > 0.004 || Math.abs(q.y - start.y) > 0.004) moved = true;
-    d.preview = rf(start, q); drawOverlay(p);
+    if (start) {
+      if (Math.abs(q.x - start.x) > 0.004 || Math.abs(q.y - start.y) > 0.004) moved = true;
+      d.preview = rf(start, q); drawOverlay(p);
+      return;
+    }
+    // ドラッグ中でない間は、枠の上でカーソルを変え×印を出し「クリックで消せる」ことを分かるようにする
+    const hit = hitIndex(rectsOf(p), q);
+    o.style.cursor = hit === -1 ? "crosshair" : "pointer";
+    if (hit !== d.hoverIndex) { d.hoverIndex = hit; drawOverlay(p); }
+  });
+  o.addEventListener("pointerleave", () => {
+    o.style.cursor = "crosshair";
+    if (d.hoverIndex !== -1) { d.hoverIndex = -1; drawOverlay(p); }
   });
   o.addEventListener("pointerup", (e) => {
     if (!start) return;
@@ -317,16 +362,13 @@ function attachDraw(p) {
       if (r.w > 0.005 && r.h > 0.005) { rectsOf(p).push(r); history.push(p); }   // ドラッグ→追加
     } else {
       const arr = rectsOf(p);                                                     // クリック→その枠を削除
-      for (let i = arr.length - 1; i >= 0; i--) {
-        const r = arr[i];
-        if (q.x >= r.x && q.x <= r.x + r.w && q.y >= r.y && q.y <= r.y + r.h) {
-          arr.splice(i, 1);
-          for (let j = history.length - 1; j >= 0; j--) if (history[j] === p) { history.splice(j, 1); break; }
-          break;
-        }
+      const idx = hitIndex(arr, q);
+      if (idx !== -1) {
+        arr.splice(idx, 1);
+        for (let j = history.length - 1; j >= 0; j--) if (history[j] === p) { history.splice(j, 1); break; }
       }
     }
-    start = null; moved = false; d.preview = null; d.redacted = false; drawOverlay(p); updateCount();
+    start = null; moved = false; d.preview = null; d.redacted = false; d.hoverIndex = -1; drawOverlay(p); updateCount();
   });
 }
 
