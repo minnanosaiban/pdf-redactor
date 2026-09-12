@@ -17,7 +17,7 @@ const dom = {};              // { ページ番号: {wrap,stage,view,overlay,rend
 const history = [];          // 枠を追加した順のページ番号（「元に戻す」用）
 let io = null;               // IntersectionObserver（遅延レンダリング）
 let applying = false;        // 墨消し適用中フラグ
-let outputBlob = null;       // 墨消し適用済みPDFのBlob（タイトルも書き込み済み。ダウンロードは即トリガーするだけ）
+let outputBlob = null;       // 墨消し適用済みPDFのBlob（メタデータも消去済み。ダウンロードは即トリガーするだけ）
 
 // ---- 要素 ----
 const $ = (id) => document.getElementById(id);
@@ -406,7 +406,7 @@ $("apply").onclick = async () => {
       markRedacted(p);
       setApplyStatus(`墨消し中… ${p}/${numPages}`);
     }
-    out.setTitle($("metaTitle").value.replace(/\s+/g, " ").trim());
+    out.setTitle("");
     out.setAuthor(""); out.setSubject("");
     out.setKeywords([]); out.setProducer("pdf-redactor"); out.setCreator("pdf-redactor");
     const outBytes = await out.save();
@@ -421,7 +421,7 @@ $("apply").onclick = async () => {
 
 // ダウンロードは a要素のclickをユーザー操作に対して同期的に呼ぶ必要がある
 // （非同期処理を挟むとブラウザによってはダウンロードが黙って無視される）ため、
-// PDFの書き出し（タイトル書き込み含む）は上の「墨消し適用」側で終わらせておき、
+// PDFの書き出し（メタデータ消去含む）は上の「墨消し適用」側で終わらせておき、
 // ここでは何も待たずに即ダウンロードを開始する。
 dlBtn.onclick = () => {
   if (!outputBlob) return;
